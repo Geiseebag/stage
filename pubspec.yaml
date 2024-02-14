@@ -1,0 +1,67 @@
+name: app_stage
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.2 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  #utility packages
+  http:
+  intl:
+  logger:
+  url_launcher:
+  flutter_native_splash:
+  smooth_page_indicator: 
+  #logos
+  iconsax_flutter: ^1.0.0
+  cupertino_icons: ^1.0.2
+  get: ^4.6.5
+  get_storage: 
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # flutter_lints: ^2.0.0
+
+flutter:
+
+
+  uses-material-design: true
+
+  #local assets
+  assets:
+    - assets/logos/
+    - assets/icons/
+    - assets/images/on_boarding_images/
+    - assets/images/animations/
+    - assets/images/banners/
+
+    
+
+  #fonts
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 800    
+
