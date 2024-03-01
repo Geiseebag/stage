@@ -20,11 +20,16 @@ dependencies:
   flutter_native_splash:
   smooth_page_indicator: 
   carousel_slider: ^4.2.1
-  #logos
+  #icons
   iconsax_flutter: ^1.0.0
   cupertino_icons: ^1.0.2
   get: ^4.6.5
   get_storage: 
+
+  #product specific
+  readmore: 
+  flutter_rating_bar: 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -45,6 +50,8 @@ flutter:
     - assets/images/animations/
     - assets/images/banners/
     - assets/images/products/
+    - assets/images/content/
+    - assets/images/reviews/
     
 
     
