@@ -1,5 +1,7 @@
+import 'package:app_stage/features/personalization/screen/settings.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/store.dart';
+import 'package:app_stage/features/shop/screen/wishlist.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,16 +45,12 @@ class NavigationMenu extends StatelessWidget {
 }
 
 class NavigationController extends GetxController {
-  Rx<int> selectedIndex = 1.obs;
+  Rx<int> selectedIndex = 0.obs;
 
   final screens = [
     HomeScreen(),
     StoreScreen(),
-    Container(
-      color: Colors.orange,
-    ),
-    Container(
-      color: Colors.blue,
-    )
+    WishListScreen(),
+    SettingsScreen()
   ];
 }

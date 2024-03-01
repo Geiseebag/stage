@@ -1,5 +1,7 @@
 /// This class contains all the App Text in String formats.
 class TTexts {
+  // -- Currency
+  static const String euroSign = '\€';
   // -- GLOBAL Texts
   static const String and = "and";
   static const String skip = "Skip";
@@ -43,6 +45,7 @@ class TTexts {
 
   // -- Authentication Headings
   static const String loginTitle = "Welcome back,";
+  static const String ProfileTitle = "Account";
   static const String loginSubTitle =
       "Discover Limitless Choices and Unmatched Convenience.";
   static const String signupTitle = "Let’s create your account";

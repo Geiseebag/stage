@@ -1,5 +1,6 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
+import 'package:app_stage/features/personalization/screen/cart.dart';
 import 'package:app_stage/features/shop/controllers/HomeController.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/colors.dart';
@@ -11,7 +12,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:http/http.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -51,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (_, index) {
                           return CategoryIcons(
-                            name: 'Mode',
+                            name: 'Chaussure',
                             backgroundOpacity: 0.8,
                           );
                         }),
@@ -132,10 +134,9 @@ class HomeAppBar extends StatelessWidget {
               .apply(color: TColors.white),
         )
       ]),
-      // Ensure back arrow is hidden
       actions: [
         TCartCounterIcon(
-          onPressed: () {},
+          onPressed: () => Get.to(() => const CartScreen()),
           iconColor: TColors.white,
         )
       ],
@@ -160,7 +161,7 @@ class TCartCounterIcon extends StatelessWidget {
       IconButton(
           onPressed: onPressed,
           icon: Icon(
-            CupertinoIcons.shopping_cart,
+            Iconsax.shopping_cart_copy,
             color: iconColor == null
                 ? dark
                     ? TColors.white
@@ -203,9 +204,10 @@ class SecondWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return SliverToBoxAdapter(
       child: Container(
-        color: TColors.white,
+        color: dark ? TColors.dark : TColors.white,
         child: Stack(
           children: [
             Positioned(
@@ -214,18 +216,10 @@ class SecondWidget extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Special Offers",
-                      style: Theme.of(context).textTheme.headlineMedium!.apply(
-                            color: TColors.darkerGrey,
-                          ),
-                    ),
-                    Text(
-                      "Explore our exclusive deals",
-                      style: Theme.of(context).textTheme.subtitle1!.apply(
-                            color: TColors.darkerGrey,
-                          ),
-                    ),
+                    Text("Special Offers",
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    Text("Explore our exclusive deals",
+                        style: Theme.of(context).textTheme.titleMedium),
                   ]),
             ),
             Column(
@@ -236,23 +230,42 @@ class SecondWidget extends StatelessWidget {
                 Padding(
                     padding: EdgeInsets.all(TSizes.defaultSpace),
                     child: TPromoSlider()),
-                GridView.builder(
-                    itemCount: 6,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: TSizes.gridViewSpacing,
-                        crossAxisSpacing: TSizes.gridViewSpacing,
-                        mainAxisExtent: 288),
-                    itemBuilder: (_, index) => TProductCardVertical()),
+                TGridLayout(
+                  itemCount: 6,
+                  itemBuilder: (_, index) => TProductCardVertical(),
+                ),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class TGridLayout extends StatelessWidget {
+  const TGridLayout({
+    super.key,
+    required this.itemCount,
+    this.mainAxisExtent = 288,
+    required this.itemBuilder,
+  });
+  final int itemCount;
+  final double? mainAxisExtent;
+  final Widget? Function(BuildContext, int) itemBuilder;
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        itemCount: itemCount,
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: TSizes.gridViewSpacing,
+            crossAxisSpacing: TSizes.gridViewSpacing,
+            mainAxisExtent: mainAxisExtent),
+        itemBuilder: itemBuilder);
   }
 }
 
@@ -295,7 +308,7 @@ class TPromoSlider extends StatelessWidget {
               for (int i = 0; i < 3; i++)
                 TCircularContainer(
                   margin: const EdgeInsets.only(right: 10),
-                  width: 20,
+                  width: controller.carousalCurrentIndex.value == i ? 30 : 15,
                   height: 4,
                   backgroundColor: controller.carousalCurrentIndex.value == i
                       ? Color.fromARGB(255, 252, 145, 154)
@@ -383,10 +396,13 @@ class TRoundedImage extends StatelessWidget {
     this.width,
     this.height,
     required this.imageUrl,
-    this.fit,
+    this.fit = BoxFit.cover,
     this.isNetworkImage = false,
     this.onPressed,
     this.applyImageRadius = true,
+    this.borderRadius = TSizes.md,
+    this.border,
+    this.backgroundColor,
   });
   final double? width, height;
   final String imageUrl;
@@ -395,7 +411,9 @@ class TRoundedImage extends StatelessWidget {
   final VoidCallback? onPressed;
   final EdgeInsetsGeometry? padding;
   final bool applyImageRadius;
-
+  final double borderRadius;
+  final BoxBorder? border;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -405,11 +423,13 @@ class TRoundedImage extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(TSizes.md),
+          border: border,
         ),
         child: ClipRRect(
           borderRadius: applyImageRadius
-              ? BorderRadius.circular(TSizes.md)
+              ? BorderRadius.circular(borderRadius)
               : BorderRadius.zero,
           child: Image(
             fit: fit,
@@ -431,7 +451,10 @@ class FirstSection extends StatelessWidget {
   final child;
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return SliverAppBar(
+      pinned: true,
+      floating: true,
       automaticallyImplyLeading: false,
       expandedHeight: 400.0, // adjust as needed
       flexibleSpace: Stack(
@@ -439,20 +462,29 @@ class FirstSection extends StatelessWidget {
           Positioned(
             top: 0,
             width: THelperFunctions.screenWidth() + 20,
-            child: Image.asset(
-              "assets/images/banners/istockphoto-1317931909-1024x1024 (1).jpg",
-              fit: BoxFit.cover,
-            ),
+            child: dark
+                ? Image.asset(
+                    "assets/images/banners/Untitled.jpeg",
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "assets/images/banners/istockphoto-1317931909-1024x1024 (1).jpg",
+                    fit: BoxFit.cover,
+                  ),
           ),
-          child,
           Positioned(
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white,
-                  ],
+                  colors: dark
+                      ? [
+                          TColors.dark.withOpacity(0.0),
+                          TColors.dark,
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.0),
+                          Colors.white,
+                        ],
                   stops: [0.8, 1],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -460,6 +492,7 @@ class FirstSection extends StatelessWidget {
               ),
             ),
           ),
+          child,
         ],
       ),
     );
