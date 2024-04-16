@@ -5,7 +5,6 @@ import 'package:app_stage/features/shop/screen/product_details.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
-import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 

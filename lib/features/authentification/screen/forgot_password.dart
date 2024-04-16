@@ -1,6 +1,7 @@
-import 'package:app_stage/features/authentification/screen/reset_password.dart';
+import 'package:app_stage/features/authentification/controllers/forgot_password_controller.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/constants/text_strings.dart';
+import 'package:app_stage/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ForgotPasswordController());
     return Scaffold(
         appBar: AppBar(),
         body: Padding(
@@ -38,10 +40,17 @@ class ForgotPasswordScreen extends StatelessWidget {
                   height: TSizes.spaceBtwSections * 2,
                 ),
                 //textfield
-                TextFormField(
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.keyboard_double_arrow_right),
-                        labelText: TTexts.email)),
+
+                Form(
+                  key: controller.forgetPasswordFormKey,
+                  child: TextFormField(
+                      controller: controller.email,
+                      validator: (value) => TValidator.validateEmail(value),
+                      decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.keyboard_double_arrow_right),
+                          labelText: TTexts.email)),
+                ),
+
                 //button
 
                 const SizedBox(
@@ -50,8 +59,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () =>
-                            Get.off(() => const ResetPasswordScreen()),
+                        onPressed: () => controller.sendPasswordResetEmail(),
                         child: Text(TTexts.submit)))
               ],
             )));

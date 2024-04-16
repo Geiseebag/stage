@@ -1,15 +1,30 @@
-import 'package:app_stage/features/authentification/screen/onboarding.dart';
-import 'package:app_stage/features/personalization/screen/address.dart';
-import 'package:app_stage/features/personalization/screen/profile.dart';
-import 'package:app_stage/features/shop/screen/home.dart';
-import 'package:app_stage/features/shop/screen/product_details.dart';
-import 'package:app_stage/features/shop/screen/product_reviews.dart';
-import 'package:app_stage/features/shop/screen/widgets/navigation_menu.dart';
+import 'package:app_stage/bindings/general_bindings.dart';
+import 'package:app_stage/data/repositories/authentication/authentication_repository.dart';
+import 'package:app_stage/firebase_options.dart';
+import 'package:app_stage/routes/app_routes.dart';
+import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/theme/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() {
+Future<void> main() async {
+  //widgets binding
+  final WidgetsBinding widgetsBinding =
+      WidgetsFlutterBinding.ensureInitialized();
+
+  //getx local storage
+  await GetStorage.init();
+
+  //await splash screen until other items load
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+//initialize fire base & authentification
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
+      .then((FirebaseApp value) => Get.put(AuthenticationRepository()));
+
   runApp(const App());
 }
 
@@ -23,7 +38,16 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      home: NavigationMenu(),
+      initialBinding: GeneralBindings(),
+      getPages: AppRoutes.pages,
+      home: Scaffold(
+        backgroundColor: TColors.primary,
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 }

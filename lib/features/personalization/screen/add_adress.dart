@@ -1,12 +1,7 @@
 import 'package:app_stage/common/widgets/appbar.dart';
-import 'package:app_stage/features/personalization/screen/add_adress.dart';
-import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
-import 'package:app_stage/utils/helpers/helper_functions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class AddUserAdressScreen extends StatelessWidget {

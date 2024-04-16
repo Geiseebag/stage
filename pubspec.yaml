@@ -16,6 +16,8 @@ dependencies:
   http:
   intl:
   logger:
+  lottie:
+  connectivity_plus:
   url_launcher:
   flutter_native_splash:
   smooth_page_indicator: 
@@ -29,6 +31,15 @@ dependencies:
   #product specific
   readmore: 
   flutter_rating_bar: 
+
+  #firebase
+  firebase_auth:
+  cloud_firestore:
+  firebase_core: ^2.24.2
+  image_picker: ^1.0.7
+  firebase_storage: ^11.6.10
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

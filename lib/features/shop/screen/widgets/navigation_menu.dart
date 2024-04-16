@@ -9,11 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NavigationMenu extends StatelessWidget {
-  const NavigationMenu({super.key});
+  const NavigationMenu({
+    super.key,
+    this.selectedPage = 0,
+  });
+  final int selectedPage;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
+    controller.selectedIndex.value = selectedPage;
     final dark = THelperFunctions.isDarkMode(context);
     return Scaffold(
       bottomNavigationBar: Obx(

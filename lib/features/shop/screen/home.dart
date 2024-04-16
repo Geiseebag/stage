@@ -1,7 +1,13 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
+import 'package:app_stage/common/widgets/shimmers/shimmers.dart';
+import 'package:app_stage/common/widgets/shimmers/vertical_product_shimmer.dart';
+import 'package:app_stage/features/personalization/controllers/user_controller.dart';
 import 'package:app_stage/features/personalization/screen/cart.dart';
 import 'package:app_stage/features/shop/controllers/HomeController.dart';
+import 'package:app_stage/features/shop/controllers/banner_controller.dart';
+import 'package:app_stage/features/shop/controllers/product_controller.dart';
+import 'package:app_stage/features/shop/screen/widgets/categories/categories.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
@@ -9,10 +15,8 @@ import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -45,19 +49,7 @@ class HomeScreen extends StatelessWidget {
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
-                  child: SizedBox(
-                    height: 70,
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 3,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (_, index) {
-                          return CategoryIcons(
-                            name: 'Chaussure',
-                            backgroundOpacity: 0.8,
-                          );
-                        }),
-                  ),
+                  child: HomeCategories(),
                 )
               ]),
             ),
@@ -117,6 +109,7 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(UserController());
     return TAppBar(
       title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
@@ -126,12 +119,14 @@ class HomeAppBar extends StatelessWidget {
               .labelMedium!
               .apply(color: TColors.lightGrey),
         ),
-        Text(
-          TTexts.homeAppbarSubTitle,
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall!
-              .apply(color: TColors.white),
+        Obx(
+          () => Text(
+            controller.user.value.fullName,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .apply(color: TColors.white),
+          ),
         )
       ]),
       actions: [
@@ -204,6 +199,8 @@ class SecondWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ProductController());
+
     final dark = THelperFunctions.isDarkMode(context);
     return SliverToBoxAdapter(
       child: Container(
@@ -230,9 +227,27 @@ class SecondWidget extends StatelessWidget {
                 Padding(
                     padding: EdgeInsets.all(TSizes.defaultSpace),
                     child: TPromoSlider()),
-                TGridLayout(
-                  itemCount: 6,
-                  itemBuilder: (_, index) => TProductCardVertical(),
+                Obx(
+                  () {
+                    if (controller.isLoading.value)
+                      return TverticalProductShimmer();
+                    if (controller.featuredProducts.isEmpty)
+                      return Center(
+                        child: Text(
+                          'No Data Found',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .apply(color: Colors.white),
+                        ),
+                      );
+                    return TGridLayout(
+                      itemCount: controller.featuredProducts.length,
+                      itemBuilder: (_, index) => TProductCardVertical(
+                        product: controller.featuredProducts[index],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -276,49 +291,55 @@ class TPromoSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
-    return Column(children: [
-      CarouselSlider(
-          items: [
-            TRoundedImage(
-                imageUrl: TImages.promoBanner1,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2)),
-            TRoundedImage(
-                imageUrl: TImages.promoBanner2,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2)),
-            TRoundedImage(
-                imageUrl: TImages.promoBanner3,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2))
-          ],
-          options: CarouselOptions(
-              viewportFraction: 0.8,
-              onPageChanged: (index, _) =>
-                  controller.updatePageIndicator(index))),
-      SizedBox(
-        height: TSizes.spaceBtwItems,
-      ),
-      Center(
-        child: Obx(
-          () => Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (int i = 0; i < 3; i++)
-                TCircularContainer(
-                  margin: const EdgeInsets.only(right: 10),
-                  width: controller.carousalCurrentIndex.value == i ? 30 : 15,
-                  height: 4,
-                  backgroundColor: controller.carousalCurrentIndex.value == i
-                      ? Color.fromARGB(255, 252, 145, 154)
-                      : TColors.grey,
-                ),
-            ],
+    final controller = Get.put(BannerController());
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const TShimmerEffect(width: double.infinity, height: 190);
+      }
+      if (controller.banners.isEmpty) {
+        return const Center(
+          child: Text('No Data Found!'),
+        );
+      } else {
+        return Column(children: [
+          CarouselSlider(
+              items: controller.banners
+                  .map((banner) => TRoundedImage(
+                        imageUrl: banner.imageUrl,
+                        isNetworkImage: true,
+                        onPressed: () => Get.toNamed(banner.targetScreen),
+                      ))
+                  .toList(),
+              options: CarouselOptions(
+                  viewportFraction: 0.8,
+                  onPageChanged: (index, _) =>
+                      controller.updatePageIndicator(index))),
+          SizedBox(
+            height: TSizes.spaceBtwItems,
           ),
-        ),
-      )
-    ]);
+          Center(
+            child: Obx(
+              () => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int i = 0; i < controller.banners.length; i++)
+                    TCircularContainer(
+                      margin: const EdgeInsets.only(right: 10),
+                      width:
+                          controller.carousalCurrentIndex.value == i ? 30 : 15,
+                      height: 4,
+                      backgroundColor:
+                          controller.carousalCurrentIndex.value == i
+                              ? Color.fromARGB(255, 252, 145, 154)
+                              : TColors.grey,
+                    ),
+                ],
+              ),
+            ),
+          )
+        ]);
+      }
+    });
   }
 }
 

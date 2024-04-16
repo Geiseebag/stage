@@ -1,13 +1,13 @@
 import 'package:app_stage/common/widgets/appbar.dart';
+import 'package:app_stage/features/personalization/controllers/user_controller.dart';
+import 'package:app_stage/features/personalization/screen/change_name.dart';
 import 'package:app_stage/features/personalization/screen/widgets/profile_menu.dart';
 import 'package:app_stage/features/shop/screen/store.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
-import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
-import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -15,6 +15,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = UserController.instance;
+
     return Scaffold(
       appBar: TAppBar(
         showBackArrow: true,
@@ -31,13 +33,23 @@ class ProfileScreen extends StatelessWidget {
                 //profile picture
 
                 children: [
-                  TCircularImage(
-                      image: TImages.user,
-                      leaveOriginalColors: true,
-                      width: 80,
-                      height: 80),
+                  Obx(
+                    () {
+                      final NetworkImage = controller.user.value.profilePicture;
+
+                      return TCircularImage(
+                        image: NetworkImage.isNotEmpty
+                            ? NetworkImage
+                            : TImages.user,
+                        leaveOriginalColors: true,
+                        width: 80,
+                        height: 80,
+                        isNetworkImage: NetworkImage.isNotEmpty,
+                      );
+                    },
+                  ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => controller.uploadUserProfilePicture(),
                     child: Text('Change Profile Picture'),
                   )
                 ],
@@ -61,14 +73,14 @@ class ProfileScreen extends StatelessWidget {
               height: TSizes.spaceBtwItems,
             ),
             TProfileMenu(
-              onPressed: () {},
+              onPressed: () => Get.to(() => ChangeNameScreen()),
               title: 'Name',
-              value: 'Ali AG',
+              value: controller.user.value.fullName,
             ),
             TProfileMenu(
               onPressed: () {},
               title: 'Username',
-              value: 'Geiseebag',
+              value: controller.user.value.username,
             ),
             SizedBox(
               height: TSizes.spaceBtwItems / 2,
@@ -87,18 +99,18 @@ class ProfileScreen extends StatelessWidget {
             TProfileMenu(
               onPressed: () {},
               title: 'User ID',
-              value: '16032',
+              value: controller.user.value.id,
               icon: Iconsax.copy_copy,
             ),
             TProfileMenu(
               onPressed: () {},
               title: 'E-mail',
-              value: 'dummydata@gmail.com',
+              value: controller.user.value.email,
             ),
             TProfileMenu(
               onPressed: () {},
               title: 'Phone Number',
-              value: '+216 92993724',
+              value: controller.user.value.phoneNumber,
             ),
             TProfileMenu(
               onPressed: () {},
@@ -119,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             Center(
                 child: TextButton(
-              onPressed: () {},
+              onPressed: () => controller.deleteAccountWarningPopup(),
               child: Text(
                 'Close Account',
                 style: TextStyle(color: const Color.fromARGB(255, 240, 98, 88)),

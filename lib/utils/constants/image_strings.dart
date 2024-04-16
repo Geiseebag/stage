@@ -2,6 +2,10 @@
 
 /// This class contains all the App Images in String formats.
 class TImages {
+  //animations
+  static const String animation1 =
+      "assets/images/animations/141594-animation-of-docer.json";
+
   // -- App Logos
   static const String darkAppLogo = "assets/logos/logo_black.png";
   static const String lightAppLogo = "assets/logos/logo_white.png";
@@ -28,6 +32,9 @@ class TImages {
       "assets/icons/categories/icons8-sparkling-diamond-64.png";
   static const String electronicsIcon =
       "assets/icons/categories/icons8-smartphone-64.png";
+  //animations
+  static const String successfullyRegisteredAnimation =
+      "assets/images/animations/72462-check-register.json";
 
   // -- Brand Icons
   static const String nikeLogo = "assets/icons/brands/nike.png";

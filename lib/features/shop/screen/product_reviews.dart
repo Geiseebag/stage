@@ -3,10 +3,8 @@ import 'package:app_stage/features/shop/screen/widgets/reviews/user_review_card.
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/device/device_utility.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ProductReviewsScreen extends StatelessWidget {
   const ProductReviewsScreen({super.key});

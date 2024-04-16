@@ -1,6 +1,8 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/primary_header_container.dart';
 import 'package:app_stage/common/widgets/list_tiles/settings.menu_tiles.dart';
+import 'package:app_stage/data/repositories/authentication/authentication_repository.dart';
+import 'package:app_stage/features/personalization/controllers/user_controller.dart';
 import 'package:app_stage/features/personalization/screen/address.dart';
 import 'package:app_stage/features/personalization/screen/profile.dart';
 import 'package:app_stage/features/shop/screen/store.dart';
@@ -110,7 +112,22 @@ class SettingsScreen extends StatelessWidget {
                     value: false,
                     onChanged: (value) {},
                   ),
-                )
+                ),
+                SizedBox(
+                  height: TSizes.spaceBtwItems,
+                ),
+                Divider(),
+                SizedBox(
+                  height: TSizes.spaceBtwItems,
+                ),
+                Center(
+                    child: TextButton(
+                  onPressed: () => AuthenticationRepository.instance.logout(),
+                  child: Text(
+                    'Logout',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ))
               ],
             ),
           )
@@ -130,23 +147,23 @@ class TUserProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = UserController.instance;
+    final NetworkImage = controller.user.value.profilePicture;
     return ListTile(
       leading: TCircularImage(
+        image: NetworkImage.isNotEmpty ? NetworkImage : TImages.user,
         leaveOriginalColors: true,
-        image: TImages.user,
-        width: 50,
-        height: 50,
-        padding: 0,
+        isNetworkImage: NetworkImage.isNotEmpty,
       ),
       title: Text(
-        "Ali AG",
+        controller.user.value.fullName,
         style: Theme.of(context)
             .textTheme
             .headlineSmall!
             .apply(color: TColors.white),
       ),
       subtitle: Text(
-        "dummydata@gmail.com",
+        controller.user.value.email,
         style:
             Theme.of(context).textTheme.bodyMedium!.apply(color: TColors.white),
       ),

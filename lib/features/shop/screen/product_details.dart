@@ -1,6 +1,7 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/primary_header_container.dart';
 import 'package:app_stage/common/widgets/texts/product_title.dart';
+import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/product_reviews.dart';
 import 'package:app_stage/features/shop/screen/widgets/bottom_add_to_cart.dart';
@@ -16,13 +17,12 @@ import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:readmore/readmore.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({super.key});
-
+  const ProductDetailsScreen({super.key, required this.product});
+  final ProductModel product;
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);

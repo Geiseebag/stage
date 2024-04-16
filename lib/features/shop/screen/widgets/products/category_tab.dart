@@ -1,4 +1,5 @@
 import 'package:app_stage/common/brand_showcase.dart';
+import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
@@ -47,7 +48,9 @@ class TCategoryTab extends StatelessWidget {
             ),
             TGridLayout(
                 itemCount: 4,
-                itemBuilder: (_, index) => TProductCardVertical()),
+                itemBuilder: (_, index) => TProductCardVertical(
+                      product: ProductModel.empty(),
+                    )),
             const SizedBox(
               height: TSizes.spaceBtwItems,
             ),

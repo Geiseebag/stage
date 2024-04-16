@@ -2,6 +2,7 @@ import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
 import 'package:app_stage/common/widgets/tabbar.dart';
 import 'package:app_stage/features/personalization/screen/cart.dart';
+import 'package:app_stage/features/shop/controllers/categoryController.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/category_tab.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
@@ -11,18 +12,20 @@ import 'package:app_stage/utils/constants/enums.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final categories = CategoryController.instance.parentCategories;
+
     final dark = THelperFunctions.isDarkMode(context);
     return DefaultTabController(
-      length: 5,
+      length: categories.length,
       child: Scaffold(
         appBar: TAppBar(
           title: Text(
@@ -80,32 +83,16 @@ class StoreScreen extends StatelessWidget {
                   ),
                 ),
                 bottom: TTabBar(
-                  tabs: [
-                    Container(
-                      width: 100,
-                      child: Tab(
-                        child: Text('Mode'),
-                      ),
-                    ),
-                    Tab(
-                      child: Text('Chaussures'),
-                    ),
-                    Tab(
-                      child: Text('Sport'),
-                    ),
-                    Tab(
-                      child: Text('Enfant'),
-                    ),
-                    Tab(
-                      child: Text('Loisir'),
-                    )
-                  ],
-                ),
+                    tabs: categories
+                        .map((category) => Tab(
+                              child: Text(category.name),
+                            ))
+                        .toList()),
               ),
             ];
           },
           body: TabBarView(
-              children: [TCategoryTab(), TCategoryTab(), TCategoryTab()]),
+              children: categories.map((category) => TCategoryTab()).toList()),
         ),
       ),
     );
@@ -189,17 +176,24 @@ class TCircularImage extends StatelessWidget {
               ? TColors.black
               : TColors.white,
           borderRadius: BorderRadius.circular(100)),
-      child: Center(
-        child: Image(
-          fit: fit,
-          image: isNetworkImage
-              ? NetworkImage(image)
-              : AssetImage(image) as ImageProvider,
-          color: leaveOriginalColors
-              ? null
-              : THelperFunctions.isDarkMode(context)
-                  ? TColors.white
-                  : TColors.black,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(100),
+        child: Center(
+          child: isNetworkImage
+              ? CachedNetworkImage(
+                  imageUrl: image,
+                  fit: fit,
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                )
+              : Image(
+                  fit: fit,
+                  image: AssetImage(image) as ImageProvider,
+                  color: leaveOriginalColors
+                      ? null
+                      : THelperFunctions.isDarkMode(context)
+                          ? TColors.white
+                          : TColors.black,
+                ),
         ),
       ),
     );

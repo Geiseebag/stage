@@ -1,4 +1,5 @@
 import 'package:app_stage/common/widgets/appbar.dart';
+import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
@@ -28,7 +29,8 @@ class WishListScreen extends StatelessWidget {
                 children: [
                   TGridLayout(
                       itemCount: 10,
-                      itemBuilder: (_, index) => const TProductCardVertical(
+                      itemBuilder: (_, index) => TProductCardVertical(
+                            product: ProductModel.empty(),
                             favourite: true,
                           ))
                 ],
