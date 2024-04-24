@@ -4,6 +4,7 @@ import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen(
@@ -24,10 +25,7 @@ class SuccessScreen extends StatelessWidget {
         padding: TSpacingStyle.paddingWithAppBarHeight * 2,
         child: Column(children: [
           //image
-          Image(
-            image: AssetImage(image),
-            width: THelperFunctions.screenWidth() * 0.6,
-          ),
+          Lottie.asset(image, width: THelperFunctions.screenWidth() * 0.6),
           const SizedBox(
             height: TSizes.spaceBtwSections,
           ),

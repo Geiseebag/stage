@@ -1,6 +1,13 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
+import 'package:app_stage/common/widgets/shimmers/shimmers.dart';
+import 'package:app_stage/common/widgets/shimmers/vertical_product_shimmer.dart';
+import 'package:app_stage/features/personalization/controllers/user_controller.dart';
+import 'package:app_stage/features/personalization/screen/cart.dart';
 import 'package:app_stage/features/shop/controllers/HomeController.dart';
+import 'package:app_stage/features/shop/controllers/banner_controller.dart';
+import 'package:app_stage/features/shop/controllers/product_controller.dart';
+import 'package:app_stage/features/shop/screen/widgets/categories/categories.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
@@ -8,10 +15,10 @@ import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -43,19 +50,7 @@ class HomeScreen extends StatelessWidget {
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
-                  child: SizedBox(
-                    height: 70,
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 3,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (_, index) {
-                          return CategoryIcons(
-                            name: 'Mode',
-                            backgroundOpacity: 0.8,
-                          );
-                        }),
-                  ),
+                  child: HomeCategories(),
                 )
               ]),
             ),
@@ -115,6 +110,7 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(UserController());
     return TAppBar(
       title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
@@ -124,18 +120,19 @@ class HomeAppBar extends StatelessWidget {
               .labelMedium!
               .apply(color: TColors.lightGrey),
         ),
-        Text(
-          TTexts.homeAppbarSubTitle,
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall!
-              .apply(color: TColors.white),
+        Obx(
+          () => Text(
+            controller.user.value.fullName,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .apply(color: TColors.white),
+          ),
         )
       ]),
-      // Ensure back arrow is hidden
       actions: [
         TCartCounterIcon(
-          onPressed: () {},
+          onPressed: () => Get.to(() => const CartScreen()),
           iconColor: TColors.white,
         )
       ],
@@ -160,7 +157,7 @@ class TCartCounterIcon extends StatelessWidget {
       IconButton(
           onPressed: onPressed,
           icon: Icon(
-            CupertinoIcons.shopping_cart,
+            Iconsax.shopping_cart_copy,
             color: iconColor == null
                 ? dark
                     ? TColors.white
@@ -203,9 +200,12 @@ class SecondWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ProductController());
+
+    final dark = THelperFunctions.isDarkMode(context);
     return SliverToBoxAdapter(
       child: Container(
-        color: TColors.white,
+        color: dark ? TColors.dark : TColors.white,
         child: Stack(
           children: [
             Positioned(
@@ -214,18 +214,10 @@ class SecondWidget extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Special Offers",
-                      style: Theme.of(context).textTheme.headlineMedium!.apply(
-                            color: TColors.darkerGrey,
-                          ),
-                    ),
-                    Text(
-                      "Explore our exclusive deals",
-                      style: Theme.of(context).textTheme.subtitle1!.apply(
-                            color: TColors.darkerGrey,
-                          ),
-                    ),
+                    Text("Special Offers",
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    Text("Explore our exclusive deals",
+                        style: Theme.of(context).textTheme.titleMedium),
                   ]),
             ),
             Column(
@@ -236,23 +228,64 @@ class SecondWidget extends StatelessWidget {
                 Padding(
                     padding: EdgeInsets.all(TSizes.defaultSpace),
                     child: TPromoSlider()),
-                GridView.builder(
-                    itemCount: 6,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: TSizes.gridViewSpacing,
-                        crossAxisSpacing: TSizes.gridViewSpacing,
-                        mainAxisExtent: 288),
-                    itemBuilder: (_, index) => TProductCardVertical()),
+                Obx(
+                  () {
+                    if (controller.isLoading.value)
+                      return TverticalProductShimmer();
+                    if (controller.featuredProducts.isEmpty)
+                      return Center(
+                        child: Text(
+                          'No Data Found',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .apply(color: Colors.white),
+                        ),
+                      );
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: TSizes.spaceBtwItems),
+                      child: TGridLayout(
+                        itemCount: controller.featuredProducts.length,
+                        itemBuilder: (_, index) => TProductCardVertical(
+                          product: controller.featuredProducts[index],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class TGridLayout extends StatelessWidget {
+  const TGridLayout({
+    super.key,
+    required this.itemCount,
+    this.mainAxisExtent = 288,
+    required this.itemBuilder,
+  });
+  final int itemCount;
+  final double? mainAxisExtent;
+  final Widget? Function(BuildContext, int) itemBuilder;
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        itemCount: itemCount,
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: TSizes.gridViewSpacing,
+            crossAxisSpacing: TSizes.gridViewSpacing,
+            mainAxisExtent: mainAxisExtent),
+        itemBuilder: itemBuilder);
   }
 }
 
@@ -263,49 +296,60 @@ class TPromoSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
-    return Column(children: [
-      CarouselSlider(
-          items: [
-            TRoundedImage(
-                imageUrl: TImages.promoBanner1,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2)),
-            TRoundedImage(
-                imageUrl: TImages.promoBanner2,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2)),
-            TRoundedImage(
-                imageUrl: TImages.promoBanner3,
-                padding:
-                    EdgeInsets.symmetric(horizontal: TSizes.spaceBtwItems / 2))
-          ],
-          options: CarouselOptions(
-              viewportFraction: 0.8,
-              onPageChanged: (index, _) =>
-                  controller.updatePageIndicator(index))),
-      SizedBox(
-        height: TSizes.spaceBtwItems,
-      ),
-      Center(
-        child: Obx(
-          () => Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (int i = 0; i < 3; i++)
-                TCircularContainer(
-                  margin: const EdgeInsets.only(right: 10),
-                  width: 20,
-                  height: 4,
-                  backgroundColor: controller.carousalCurrentIndex.value == i
-                      ? Color.fromARGB(255, 252, 145, 154)
-                      : TColors.grey,
-                ),
-            ],
+    final controller = Get.put(BannerController());
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const TShimmerEffect(width: double.infinity, height: 190);
+      }
+      if (controller.banners.isEmpty) {
+        return const Center(
+          child: Text('No Data Found!'),
+        );
+      } else {
+        return Column(children: [
+          CarouselSlider(
+              items: controller.banners
+                  .map(
+                    (banner) => Padding(
+                      padding:
+                          const EdgeInsets.only(right: TSizes.spaceBtwItems),
+                      child: TRoundedImage(
+                        imageUrl: banner.imageUrl,
+                        onPressed: () => Get.toNamed(banner.targetScreen),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              options: CarouselOptions(
+                  viewportFraction: 0.8,
+                  onPageChanged: (index, _) =>
+                      controller.updatePageIndicator(index))),
+          SizedBox(
+            height: TSizes.spaceBtwItems,
           ),
-        ),
-      )
-    ]);
+          Center(
+            child: Obx(
+              () => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int i = 0; i < controller.banners.length; i++)
+                    TCircularContainer(
+                      margin: const EdgeInsets.only(right: 10),
+                      width:
+                          controller.carousalCurrentIndex.value == i ? 30 : 15,
+                      height: 4,
+                      backgroundColor:
+                          controller.carousalCurrentIndex.value == i
+                              ? Color.fromARGB(255, 252, 145, 154)
+                              : TColors.grey,
+                    ),
+                ],
+              ),
+            ),
+          )
+        ]);
+      }
+    });
   }
 }
 
@@ -383,10 +427,13 @@ class TRoundedImage extends StatelessWidget {
     this.width,
     this.height,
     required this.imageUrl,
-    this.fit,
+    this.fit = BoxFit.cover,
     this.isNetworkImage = false,
     this.onPressed,
     this.applyImageRadius = true,
+    this.borderRadius = TSizes.md,
+    this.border,
+    this.backgroundColor,
   });
   final double? width, height;
   final String imageUrl;
@@ -395,7 +442,9 @@ class TRoundedImage extends StatelessWidget {
   final VoidCallback? onPressed;
   final EdgeInsetsGeometry? padding;
   final bool applyImageRadius;
-
+  final double borderRadius;
+  final BoxBorder? border;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -405,11 +454,13 @@ class TRoundedImage extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(TSizes.md),
+          border: border,
         ),
         child: ClipRRect(
           borderRadius: applyImageRadius
-              ? BorderRadius.circular(TSizes.md)
+              ? BorderRadius.circular(borderRadius)
               : BorderRadius.zero,
           child: Image(
             fit: fit,
@@ -431,7 +482,10 @@ class FirstSection extends StatelessWidget {
   final child;
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return SliverAppBar(
+      pinned: true,
+      floating: true,
       automaticallyImplyLeading: false,
       expandedHeight: 400.0, // adjust as needed
       flexibleSpace: Stack(
@@ -439,20 +493,29 @@ class FirstSection extends StatelessWidget {
           Positioned(
             top: 0,
             width: THelperFunctions.screenWidth() + 20,
-            child: Image.asset(
-              "assets/images/banners/istockphoto-1317931909-1024x1024 (1).jpg",
-              fit: BoxFit.cover,
-            ),
+            child: dark
+                ? Image.asset(
+                    "assets/images/banners/Untitled.jpeg",
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "assets/images/banners/istockphoto-1317931909-1024x1024 (1).jpg",
+                    fit: BoxFit.cover,
+                  ),
           ),
-          child,
           Positioned(
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white,
-                  ],
+                  colors: dark
+                      ? [
+                          TColors.dark.withOpacity(0.0),
+                          TColors.dark,
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.0),
+                          Colors.white,
+                        ],
                   stops: [0.8, 1],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -460,6 +523,7 @@ class FirstSection extends StatelessWidget {
               ),
             ),
           ),
+          child,
         ],
       ),
     );

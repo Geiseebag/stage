@@ -1,3 +1,4 @@
+import 'package:app_stage/features/authentification/controllers/forgot_password_controller.dart';
 import 'package:app_stage/features/authentification/screen/login.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
@@ -8,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ResetPasswordScreen extends StatelessWidget {
-  const ResetPasswordScreen({super.key});
-
+  const ResetPasswordScreen({super.key, required this.email});
+  final String email;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +33,14 @@ class ResetPasswordScreen extends StatelessWidget {
               height: TSizes.spaceBtwSections,
             ),
             //text
+            Text(
+              email,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: TSizes.spaceBtwItems,
+            ),
             Text(
               TTexts.changeYourPasswordTitle,
               style: Theme.of(context).textTheme.headlineMedium,
@@ -62,7 +71,9 @@ class ResetPasswordScreen extends StatelessWidget {
             SizedBox(
                 width: double.infinity,
                 child: TextButton(
-                    onPressed: () {}, child: Text(TTexts.resendEmail)))
+                    onPressed: () => ForgotPasswordController.instance
+                        .resendPasswordResetEmail(email),
+                    child: Text(TTexts.resendEmail)))
           ]),
         ));
   }

@@ -1,4 +1,3 @@
-import 'package:app_stage/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class TProductTitleText extends StatelessWidget {
@@ -17,8 +16,8 @@ class TProductTitleText extends StatelessWidget {
     return Text(
       title,
       style: smallSizes
-          ? Theme.of(context).textTheme.labelLarge!.apply(color: TColors.black)
-          : Theme.of(context).textTheme.titleSmall!.apply(color: TColors.black),
+          ? Theme.of(context).textTheme.bodyLarge
+          : Theme.of(context).textTheme.titleSmall,
       overflow: TextOverflow.ellipsis,
       maxLines: maxLines,
       textAlign: textAlign,
