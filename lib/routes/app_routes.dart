@@ -15,7 +15,7 @@ import 'package:get/get.dart';
 class AppRoutes {
   static final pages = [
     GetPage(name: '/', page: () => const HomeScreen()),
-    GetPage(name: '/store', page: () => const StoreScreen()),
+    GetPage(name: '/store', page: () => StoreScreen()),
     GetPage(name: '/wishlist', page: () => const WishListScreen()),
     GetPage(name: '/settings', page: () => const SettingsScreen()),
     GetPage(name: '/productReviews', page: () => const ProductReviewsScreen()),

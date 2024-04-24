@@ -34,8 +34,8 @@ class ProductModel {
     this.description,
     this.categoryId,
     this.images,
-    // this.productAttributes,
-    // this.productVariations,
+    this.productAttributes,
+    this.productVariations,
   });
 
   static ProductModel empty() => ProductModel(
@@ -62,12 +62,12 @@ class ProductModel {
       'CategoryId': categoryId,
       'Images': images ?? [],
       'ProductType': productType,
-      //   'ProductAttributes': productAttributes != null
-      //       ? productAttributes?.map((e) => e.toJson()).toList()
-      //       : [],
-      //   'ProductVariations': productVariations != null
-      //       ? productVariations?.map((e) => e.toJson()).toList()
-      //       : [],
+      'ProductAttributes': productAttributes != null
+          ? productAttributes?.map((e) => e.toJson()).toList()
+          : [],
+      'ProductVariations': productVariations != null
+          ? productVariations?.map((e) => e.toJson()).toList()
+          : [],
     };
   }
 
@@ -87,41 +87,42 @@ class ProductModel {
         productType: data['ProductType'] ?? "ProductType.single",
         price: double.parse((data['Price'] ?? 0.0).toString()),
         salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
-        brand: BrandModel.fromJson(data['Brand']) ?? null,
-        images:
-            data['Images'] != null ? List<String>.from(data['Images']) : []);
-    // productAttributes: data['ProductAttributes'] != null
-    //     ? (data['ProductAttributes'] as List<dynamic>)
-    //         .map((e) => ProductAttributesModel.fromJson(e))
-    //         .toList()
-    //     : [],
-    // productVariations: data['ProductVariations'] != null
-    //     ? (data['ProductVariations'] as List<dynamic>)
-    //         .map((e) => ProductVariationModel.fromJson(e))
-    //         .toList()
-    //     : []);
+        brand: data['Brand'] != null
+            ? BrandModel.fromJson(data['Brand'])
+            : BrandModel.empty(),
+        images: data['Images'] != null ? List<String>.from(data['Images']) : [],
+        productAttributes: data['ProductAttributes'] != null
+            ? (data['ProductAttributes'] as List<dynamic>)
+                .map((e) => ProductAttributesModel.fromJson(e))
+                .toList()
+            : [],
+        productVariations: data['ProductVariations'] != null
+            ? (data['ProductVariations'] as List<dynamic>)
+                .map((e) => ProductVariationModel.fromJson(e))
+                .toList()
+            : []);
   }
-  // factory ProductModel.fromQuerySnapshot(
-  //     QueryDocumentSnapshot<Object?> document) {
-  //   final data = document.data() as Map<String, dynamic>;
-  //   return ProductModel(
-  //       id: document.id,
-  //       stock: data['Stock'] ?? 0,
-  //       sku: data['SKU'],
-  //       price: double.parse((data['Price'] ?? 0.0).toString()),
-  //       title: data['Title'],
-  //       salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
-  //       thumbnail: data['Thumbnail'] ?? '',
-  //       brand: BrandModel.fromJson(data['Brand']),
-  //       description: data['Description'] ?? '',
-  //       categoryId: data['CategoryId'] ?? '',
-  //       images: data['Images'] != null ? List<String>.from(data['Images']) : [],
-  //       productType: data['ProductType'] ?? '',
-  //       productAttributes: (data['ProductAttributes'] as List<dynamic>)
-  //           .map((e) => ProductAttributesModel.fromJson(e))
-  //           .toList(),
-  //       productVariations: (data['ProductVariations'] as List<dynamic>)
-  //           .map((e) => ProductVariationModel.fromJson(e))
-  //           .toList());
-  // }
+  factory ProductModel.fromQuerySnapshot(
+      QueryDocumentSnapshot<Object?> document) {
+    final data = document.data() as Map<String, dynamic>;
+    return ProductModel(
+        id: document.id,
+        stock: data['Stock'] ?? 0,
+        sku: data['SKU'],
+        price: double.parse((data['Price'] ?? 0.0).toString()),
+        title: data['Title'],
+        salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
+        thumbnail: data['Thumbnail'] ?? '',
+        brand: BrandModel.fromJson(data['Brand']),
+        description: data['Description'] ?? '',
+        categoryId: data['CategoryId'] ?? '',
+        images: data['Images'] != null ? List<String>.from(data['Images']) : [],
+        productType: data['ProductType'] ?? '',
+        productAttributes: (data['ProductAttributes'] as List<dynamic>)
+            .map((e) => ProductAttributesModel.fromJson(e))
+            .toList(),
+        productVariations: (data['ProductVariations'] as List<dynamic>)
+            .map((e) => ProductVariationModel.fromJson(e))
+            .toList());
+  }
 }

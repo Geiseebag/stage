@@ -22,17 +22,13 @@ class ProductController extends GetxController {
 
   void fetchFeaturedProducuts() async {
     try {
-      print("0");
       isLoading.value = true;
-      print("1");
 
       //get products
       final products = await productRepository.getFeaturedProducts();
       //assign products
-      print("2");
 
       featuredProducts.assignAll(products);
-      print("3");
     } catch (e) {
       print(e.toString());
       Tloaders.errorSnackBar(title: 'Oh Shit!', message: e.toString());
@@ -62,7 +58,7 @@ class ProductController extends GetxController {
       if (smallestPrice.isEqual(largestPrice)) {
         return largestPrice.toString();
       } else {
-        return '$smallestPrice - \$$largestPrice';
+        return '$smallestPrice - $largestPrice';
       }
     }
   }
@@ -76,6 +72,7 @@ class ProductController extends GetxController {
 
   String getProductStockStatus(int stock) {
     {
+      print(stock);
       return stock > 0 ? 'In Stock' : 'Out Of Stock';
     }
   }

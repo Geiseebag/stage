@@ -20,7 +20,7 @@ class TChoiceChip extends StatelessWidget {
       child: ChoiceChip(
         label: isColor ? SizedBox() : Text(text),
         selected: selected,
-        onSelected: (value) {},
+        onSelected: onSelected,
         labelStyle: TextStyle(color: selected ? TColors.white : null),
         avatar: isColor
             ? TCircularContainer(

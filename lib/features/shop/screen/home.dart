@@ -16,6 +16,7 @@ import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -241,10 +242,14 @@ class SecondWidget extends StatelessWidget {
                               .apply(color: Colors.white),
                         ),
                       );
-                    return TGridLayout(
-                      itemCount: controller.featuredProducts.length,
-                      itemBuilder: (_, index) => TProductCardVertical(
-                        product: controller.featuredProducts[index],
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: TSizes.spaceBtwItems),
+                      child: TGridLayout(
+                        itemCount: controller.featuredProducts.length,
+                        itemBuilder: (_, index) => TProductCardVertical(
+                          product: controller.featuredProducts[index],
+                        ),
                       ),
                     );
                   },
@@ -304,11 +309,16 @@ class TPromoSlider extends StatelessWidget {
         return Column(children: [
           CarouselSlider(
               items: controller.banners
-                  .map((banner) => TRoundedImage(
+                  .map(
+                    (banner) => Padding(
+                      padding:
+                          const EdgeInsets.only(right: TSizes.spaceBtwItems),
+                      child: TRoundedImage(
                         imageUrl: banner.imageUrl,
-                        isNetworkImage: true,
                         onPressed: () => Get.toNamed(banner.targetScreen),
-                      ))
+                      ),
+                    ),
+                  )
                   .toList(),
               options: CarouselOptions(
                   viewportFraction: 0.8,

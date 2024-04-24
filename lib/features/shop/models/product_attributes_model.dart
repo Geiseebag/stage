@@ -13,7 +13,9 @@ class ProductAttributesModel {
 
   factory ProductAttributesModel.fromJson(Map<String, dynamic> document) {
     final data = document;
-    if (data.isEmpty) return ProductAttributesModel();
+    if (data.isEmpty) {
+      return ProductAttributesModel();
+    }
 
     return ProductAttributesModel(
         name: data.containsKey('Name') ? data['Name'] : '',

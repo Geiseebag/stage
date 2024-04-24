@@ -67,8 +67,8 @@ class UpdateNameController extends GetxController {
 
       //success message
       Tloaders.successSnackBar(
-          title: 'Congratulations', message: "Your shit has been updated.");
-      Get.to(() => NavigationMenu());
+          title: 'Congratulations', message: "Your name has been updated.");
+      Get.offAll(() => NavigationMenu());
     } catch (e) {
       Tloaders.errorSnackBar(title: 'Oh Shit!', message: e.toString());
     }

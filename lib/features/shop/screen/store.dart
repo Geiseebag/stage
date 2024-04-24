@@ -1,15 +1,18 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
+import 'package:app_stage/common/widgets/shimmers/brands_shimmer.dart';
 import 'package:app_stage/common/widgets/tabbar.dart';
 import 'package:app_stage/features/personalization/screen/cart.dart';
+import 'package:app_stage/features/shop/controllers/brand_controller.dart';
 import 'package:app_stage/features/shop/controllers/categoryController.dart';
+import 'package:app_stage/features/shop/models/brand_model.dart';
+import 'package:app_stage/features/shop/screen/brand_products.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/category_tab.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/enums.dart';
-import 'package:app_stage/utils/constants/image_strings.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,15 +20,33 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class StoreScreen extends StatelessWidget {
-  const StoreScreen({super.key});
+  StoreScreen({super.key, this.initialIndex = 0}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTabBar());
+  }
+  final int initialIndex;
+  final ScrollController scrollController = ScrollController();
+  void scrollToTabBar() {
+    // You may need to adjust the offset value to match the position of your tab bar
+    final double tabBarOffset = 400; // Example offset, adjust as needed
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        tabBarOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final categories = CategoryController.instance.parentCategories;
+    final brandController = Get.put(BrandController());
 
     final dark = THelperFunctions.isDarkMode(context);
+
     return DefaultTabController(
       length: categories.length,
+      initialIndex: initialIndex,
       child: Scaffold(
         appBar: TAppBar(
           title: Text(
@@ -39,6 +60,7 @@ class StoreScreen extends StatelessWidget {
           ],
         ),
         body: NestedScrollView(
+          controller: scrollController,
           headerSliverBuilder: (_, innerBoxIsScrollable) {
             return [
               SliverAppBar(
@@ -75,10 +97,33 @@ class StoreScreen extends StatelessWidget {
                       SizedBox(
                         height: TSizes.spaceBtwItems / 1.5,
                       ),
-                      TGridLayout(
-                          mainAxisExtent: 80,
-                          itemCount: 4,
-                          itemBuilder: (_, index) => TBrandCard())
+                      Obx(() {
+                        if (brandController.isLoading == true)
+                          return const TBrandsShimmer();
+                        if (brandController.featuredBrands.isEmpty) {
+                          return Center(
+                            child: Text(
+                              'No Data Found',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .apply(color: Colors.white),
+                            ),
+                          );
+                        }
+                        return TGridLayout(
+                            mainAxisExtent: 80,
+                            itemCount: brandController.featuredBrands.length,
+                            itemBuilder: (_, index) {
+                              final brand =
+                                  brandController.featuredBrands[index];
+                              return TBrandCard(
+                                brand: brand,
+                                onTap: () =>
+                                    Get.to(() => BrandProducts(brand: brand)),
+                              );
+                            });
+                      })
                     ],
                   ),
                 ),
@@ -92,7 +137,11 @@ class StoreScreen extends StatelessWidget {
             ];
           },
           body: TabBarView(
-              children: categories.map((category) => TCategoryTab()).toList()),
+              children: categories
+                  .map((category) => TCategoryTab(
+                        category: category,
+                      ))
+                  .toList()),
         ),
       ),
     );
@@ -104,7 +153,9 @@ class TBrandCard extends StatelessWidget {
     super.key,
     this.showBorder = true,
     this.onTap,
+    required this.brand,
   });
+  final BrandModel brand;
   final bool showBorder;
   final void Function()? onTap;
 
@@ -119,7 +170,7 @@ class TBrandCard extends StatelessWidget {
         child: Row(children: [
           Flexible(
             child: TCircularImage(
-              image: TImages.clothIcon,
+              image: brand.image,
             ),
           ),
           const SizedBox(width: TSizes.spaceBtwItems / 2),
@@ -129,9 +180,10 @@ class TBrandCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TVerifiedTitle(brandTextSize: TextSizes.medium, title: 'Nike'),
+                TVerifiedTitle(
+                    brandTextSize: TextSizes.medium, title: brand.name),
                 Text(
-                  '256 products',
+                  '${brand.productsCount ?? 0} products',
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelMedium,
                 )

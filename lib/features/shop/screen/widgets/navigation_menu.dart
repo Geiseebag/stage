@@ -29,7 +29,7 @@ class NavigationMenu extends StatelessWidget {
             backgroundColor: dark ? TColors.black : TColors.white,
             indicatorColor: dark
                 ? TColors.white.withOpacity(0.1)
-                : TColors.black.withOpacity(0.1),
+                : const Color.fromARGB(255, 43, 32, 32).withOpacity(0.1),
             onDestinationSelected: (index) {
               controller.selectedIndex.value = index;
             },
@@ -51,11 +51,16 @@ class NavigationMenu extends StatelessWidget {
 
 class NavigationController extends GetxController {
   Rx<int> selectedIndex = 0.obs;
-
   final screens = [
     HomeScreen(),
     StoreScreen(),
     WishListScreen(),
     SettingsScreen()
   ];
+  void navigateToStore(int? index) {
+    selectedIndex.value = 1; // Navigate to Store screen
+    index != null
+        ? screens[1] = StoreScreen(initialIndex: index)
+        : screens[1] = StoreScreen(); // Update Store screen with initial index
+  }
 }

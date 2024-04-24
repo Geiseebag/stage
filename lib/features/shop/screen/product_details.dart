@@ -1,6 +1,8 @@
 import 'package:app_stage/common/widgets/appbar.dart';
 import 'package:app_stage/common/widgets/custom_shapes/primary_header_container.dart';
 import 'package:app_stage/common/widgets/texts/product_title.dart';
+import 'package:app_stage/features/shop/controllers/images_controller.dart';
+import 'package:app_stage/features/shop/controllers/product_controller.dart';
 import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/product_reviews.dart';
@@ -25,14 +27,15 @@ class ProductDetailsScreen extends StatelessWidget {
   final ProductModel product;
   @override
   Widget build(BuildContext context) {
-    final dark = THelperFunctions.isDarkMode(context);
     return Scaffold(
       bottomNavigationBar: TBottomAddToCart(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             //Product image slider
-            TProductImageSlider(dark: dark),
+            TProductImageSlider(
+              product: product,
+            ),
 
             //Product Details
             Padding(
@@ -48,15 +51,21 @@ class ProductDetailsScreen extends StatelessWidget {
                     height: TSizes.spaceBtwItems / 2,
                   ),
                   //price,title & brand
-                  TProductMetaData(),
+                  TProductMetaData(
+                    product: product,
+                  ),
                   SizedBox(
-                    height: TSizes.spaceBtwItems / 2,
+                    height: TSizes.spaceBtwItems,
                   ),
                   //attributes
-                  TProductAttributes(),
-                  SizedBox(
-                    height: TSizes.spaceBtwSections,
-                  ),
+                  if (product.productType == ProductType.variable.toString())
+                    TProductAttributes(
+                      product: product,
+                    ),
+                  if (product.productType == ProductType.variable.toString())
+                    SizedBox(
+                      height: TSizes.spaceBtwSections,
+                    ),
                   //checkout button
 
                   SizedBox(
@@ -76,7 +85,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     height: TSizes.spaceBtwItems,
                   ),
                   ReadMoreText(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sollicitudin convallis ligula, et suscipit urna volutpat eu. Ut sodales ex a eros luctus malesuada. Pellentesque quis consectetur est. Donec commodo magna eget augue porta scelerisque. Sed interdum velit a condimentum molestie. Ut non eleifend dolor. ',
+                    product.description ?? '',
                     trimLines: 2,
                     trimMode: TrimMode.Line,
                     trimCollapsedText: ' Show More',
@@ -120,45 +129,56 @@ class ProductDetailsScreen extends StatelessWidget {
 }
 
 class TProductMetaData extends StatelessWidget {
-  const TProductMetaData({super.key});
+  const TProductMetaData({super.key, required this.product});
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
+    final controller = ProductController.instance;
+    final salePercentage =
+        controller.calculateSalePercentage(product.price, product.salePrice);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         //price  & sale tag
         Row(
           children: [
-            //sale tag
-            TRoundedContainer(
-              radius: TSizes.sm,
-              padding: const EdgeInsets.symmetric(
-                horizontal: TSizes.sm,
-                vertical: TSizes.xs,
+            if (salePercentage != null)
+              //sale tag
+              TRoundedContainer(
+                radius: TSizes.sm,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: TSizes.sm,
+                  vertical: TSizes.xs,
+                ),
+                backgroundColor: TColors.secondary.withOpacity(0.8),
+                child: Text(
+                  "$salePercentage%",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelLarge!
+                      .apply(color: TColors.black),
+                ),
               ),
-              backgroundColor: TColors.secondary.withOpacity(0.8),
-              child: Text(
-                "25%",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge!
-                    .apply(color: TColors.black),
+            if (salePercentage != null)
+              SizedBox(
+                width: TSizes.defaultSpace,
               ),
-            ),
-            SizedBox(
-              width: TSizes.defaultSpace,
-            ),
             //price
+            if (product.productType == ProductType.single.toString() &&
+                product.salePrice > 0)
+              TProductPriceText(
+                price: '${product.price}',
+                lineThrough: true,
+              ),
+            if (product.productType == ProductType.single.toString() &&
+                product.salePrice > 0)
+              SizedBox(
+                width: TSizes.spaceBtwItems,
+              ),
             TProductPriceText(
-              price: '250',
-              lineThrough: true,
-            ),
-            SizedBox(
-              width: TSizes.spaceBtwItems,
-            ),
-            TProductPriceText(
-              price: '175',
+              price: controller.getProductPrice(product),
               isLarge: true,
             )
           ],
@@ -169,7 +189,7 @@ class TProductMetaData extends StatelessWidget {
 
         //title
 
-        TProductTitleText(title: 'Green Nikes'),
+        TProductTitleText(title: product.title),
         SizedBox(
           height: TSizes.spaceBtwItems / 1.5,
         ),
@@ -186,7 +206,7 @@ class TProductMetaData extends StatelessWidget {
               width: TSizes.spaceBtwItems,
             ),
             Text(
-              "In Stock",
+              controller.getProductStockStatus(product.stock),
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -197,15 +217,11 @@ class TProductMetaData extends StatelessWidget {
         ),
 
         //brand
-
-        Row(
-          children: [
-            TVerifiedTitle(
-              title: 'Nike',
-              brandTextSize: TextSizes.medium,
-            ),
-          ],
-        )
+        if (product.brand != null)
+          TVerifiedTitle(
+            title: product.brand!.name,
+            brandTextSize: TextSizes.medium,
+          ),
       ],
     );
   }
@@ -270,13 +286,16 @@ class TRating extends StatelessWidget {
 class TProductImageSlider extends StatelessWidget {
   const TProductImageSlider({
     super.key,
-    required this.dark,
+    required this.product,
   });
-
-  final bool dark;
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ImageController());
+    final images = controller.getAllProductImages(product);
+    final dark = THelperFunctions.isDarkMode(context);
+
     return TCurvedEdgeWidget(
         child: Container(
       color: dark ? TColors.darkerGrey : TColors.light,
@@ -286,10 +305,25 @@ class TProductImageSlider extends StatelessWidget {
             height: 400,
             child: Padding(
               padding: const EdgeInsets.all(TSizes.productImageRadius * 2),
-              child: Center(
-                child: Image(
-                  image: AssetImage(TImages.productImage1),
-                ),
+              child: PageView.builder(
+                controller: controller.pageController,
+                onPageChanged: (index) {
+                  // This is triggered whenever the page changes
+                  controller.selectedProductImage.value = images[index];
+                  controller.currentPage.value =
+                      index; // Update the current page index
+                }, // Add this line
+                itemCount: images.length, // Add this line
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () => controller.showEnlargedImage(
+                        images[index]), // Use index to get the image
+                    child: Image(
+                      image: AssetImage(
+                          images[index]), // Use index to get the image
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -305,17 +339,26 @@ class TProductImageSlider extends StatelessWidget {
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 physics: AlwaysScrollableScrollPhysics(),
-                itemBuilder: (_, index) => TRoundedImage(
-                  padding: EdgeInsets.all(TSizes.sm),
-                  border: Border.all(color: TColors.primary),
-                  width: 80,
-                  imageUrl: TImages.productImage1,
-                  backgroundColor: dark ? TColors.dark : TColors.white,
-                ),
+                itemBuilder: (_, index) => Obx(() {
+                  final selectedImage =
+                      controller.selectedProductImage.value == images[index];
+                  return TRoundedImage(
+                    onPressed: () =>
+                        controller.selectImage(images[index], index),
+                    padding: EdgeInsets.all(TSizes.sm),
+                    border: Border.all(
+                        color: selectedImage
+                            ? TColors.primary
+                            : Colors.transparent),
+                    width: 80,
+                    imageUrl: images[index],
+                    backgroundColor: dark ? TColors.dark : TColors.white,
+                  );
+                }),
                 separatorBuilder: ((_, __) => SizedBox(
                       width: TSizes.spaceBtwItems,
                     )),
-                itemCount: 4,
+                itemCount: images.length,
               ),
             ),
           ),

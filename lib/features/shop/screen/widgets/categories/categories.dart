@@ -1,6 +1,7 @@
 import 'package:app_stage/common/widgets/shimmers/category_shimmer.dart';
 import 'package:app_stage/features/shop/controllers/categoryController.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
+import 'package:app_stage/features/shop/screen/widgets/navigation_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,6 +40,11 @@ class HomeCategories extends StatelessWidget {
               return CategoryIcons(
                 name: category.name,
                 backgroundOpacity: 0.8,
+                onTap: () {
+                  final index =
+                      categoryController.parentCategories.indexOf(category);
+                  Get.find<NavigationController>().navigateToStore(index);
+                },
               );
             }),
       );

@@ -45,12 +45,13 @@ class TProductCardVertical extends StatelessWidget {
                   //thumbnail
                   TRoundedContainer(
                     height: 180,
+                    width: 180,
                     padding: const EdgeInsets.all(TSizes.sm),
                     backgroundColor: dark ? TColors.dark : TColors.light,
                     child: Stack(
                       children: [
                         //thumbnail image
-                        Positioned.fill(
+                        Center(
                           child: TRoundedImage(
                             imageUrl: product.thumbnail,
                             applyImageRadius: true,
@@ -58,24 +59,27 @@ class TProductCardVertical extends StatelessWidget {
                         ),
 
                         //Sale tag
-                        Positioned(
-                          top: 3,
-                          child: TRoundedContainer(
-                            radius: TSizes.sm,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: TSizes.sm,
-                              vertical: TSizes.xs,
-                            ),
-                            backgroundColor: TColors.secondary.withOpacity(0.8),
-                            child: Text(
-                              "$salePercentage",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge!
-                                  .apply(color: TColors.black),
-                            ),
-                          ),
-                        ),
+                        salePercentage != null
+                            ? Positioned(
+                                top: 3,
+                                child: TRoundedContainer(
+                                  radius: TSizes.sm,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: TSizes.sm,
+                                    vertical: TSizes.xs,
+                                  ),
+                                  backgroundColor:
+                                      TColors.secondary.withOpacity(0.8),
+                                  child: Text(
+                                    "$salePercentage%",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge!
+                                        .apply(color: TColors.black),
+                                  ),
+                                ),
+                              )
+                            : Container(),
                         //favorite icon button
                         Positioned(
                           top: 0,
@@ -130,10 +134,10 @@ class TProductCardVertical extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(left: TSizes.sm),
                                 child: Text(
-                                  product.price.toString(),
+                                  product.price.toString() + "€",
                                   style: Theme.of(context)
                                       .textTheme
-                                      .labelMedium!
+                                      .bodySmall!
                                       .apply(
                                           decoration:
                                               TextDecoration.lineThrough),
@@ -142,11 +146,11 @@ class TProductCardVertical extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(left: TSizes.sm),
                               child: Text(
-                                controller.getProductPrice(product),
+                                controller.getProductPrice(product) + "€",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style:
-                                    Theme.of(context).textTheme.headlineMedium,
+                                    Theme.of(context).textTheme.headlineSmall,
                               ),
                             ),
                           ],
