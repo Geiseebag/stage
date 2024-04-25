@@ -2,7 +2,7 @@ import 'package:app_stage/features/authentification/screen/onboarding.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+
 
 void main() {
   runApp(const App());
