@@ -8,11 +8,11 @@ import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/product_reviews.dart';
 import 'package:app_stage/features/shop/screen/widgets/bottom_add_to_cart.dart';
 import 'package:app_stage/features/shop/screen/widgets/product%20details/product_attributes.dart';
+import 'package:app_stage/features/shop/screen/widgets/products/favourite_icon.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/enums.dart';
-import 'package:app_stage/utils/constants/image_strings.dart';
 import 'package:app_stage/utils/constants/sizes.dart';
 import 'package:app_stage/utils/constants/text_strings.dart';
 import 'package:app_stage/utils/helpers/helper_functions.dart';
@@ -365,13 +365,7 @@ class TProductImageSlider extends StatelessWidget {
           //Appbar
           TAppBar(
             showBackArrow: true,
-            actions: [
-              TCircularIcon(
-                backgroundColor: dark ? TColors.dark : TColors.white,
-                icon: CupertinoIcons.heart,
-                color: TColors.primary,
-              )
-            ],
+            actions: [TFavouriteIcon()],
           )
         ],
       ),

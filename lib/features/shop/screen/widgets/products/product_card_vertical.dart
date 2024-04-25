@@ -4,6 +4,7 @@ import 'package:app_stage/features/shop/controllers/product_controller.dart';
 import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/product_details.dart';
+import 'package:app_stage/features/shop/screen/widgets/products/favourite_icon.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/enums.dart';
 import 'package:app_stage/utils/constants/image_strings.dart';
@@ -84,15 +85,7 @@ class TProductCardVertical extends StatelessWidget {
                         Positioned(
                           top: 0,
                           right: 0,
-                          child: TCircularIcon(
-                            backgroundColor: dark
-                                ? TColors.black.withOpacity(0.7)
-                                : TColors.white.withOpacity(0.7),
-                            icon: favourite
-                                ? CupertinoIcons.heart_fill
-                                : CupertinoIcons.heart,
-                            color: Color.fromARGB(255, 252, 145, 154),
-                          ),
+                          child: TFavouriteIcon(),
                         ),
                       ],
                     ),

@@ -3,6 +3,7 @@ import 'package:app_stage/features/shop/controllers/product_controller.dart';
 import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
 import 'package:app_stage/features/shop/screen/product_details.dart';
+import 'package:app_stage/features/shop/screen/widgets/products/favourite_icon.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/colors.dart';
 import 'package:app_stage/utils/constants/enums.dart';
@@ -75,13 +76,7 @@ class TProductCardHorizontal extends StatelessWidget {
                         ),
                       ),
                     ),
-                  const Positioned(
-                      top: 0,
-                      right: 0,
-                      child: TCircularIcon(
-                        icon: CupertinoIcons.heart,
-                        color: TColors.primary,
-                      ))
+                  const Positioned(top: 0, right: 0, child: TFavouriteIcon())
                 ],
               ),
             ),
