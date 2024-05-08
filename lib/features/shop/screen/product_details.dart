@@ -28,7 +28,9 @@ class ProductDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: TBottomAddToCart(),
+      bottomNavigationBar: TBottomAddToCart(
+        product: product,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -66,15 +68,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     SizedBox(
                       height: TSizes.spaceBtwSections,
                     ),
-                  //checkout button
 
-                  SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                          onPressed: () {}, child: Text('Checkout'))),
-                  SizedBox(
-                    height: TSizes.spaceBtwSections,
-                  ),
                   //description
 
                   TSectionHeading(
@@ -319,7 +313,7 @@ class TProductImageSlider extends StatelessWidget {
                     onTap: () => controller.showEnlargedImage(
                         images[index]), // Use index to get the image
                     child: Image(
-                      image: AssetImage(
+                      image: NetworkImage(
                           images[index]), // Use index to get the image
                     ),
                   );
@@ -343,6 +337,7 @@ class TProductImageSlider extends StatelessWidget {
                   final selectedImage =
                       controller.selectedProductImage.value == images[index];
                   return TRoundedImage(
+                    isNetworkImage: true,
                     onPressed: () =>
                         controller.selectImage(images[index], index),
                     padding: EdgeInsets.all(TSizes.sm),
@@ -365,7 +360,11 @@ class TProductImageSlider extends StatelessWidget {
           //Appbar
           TAppBar(
             showBackArrow: true,
-            actions: [TFavouriteIcon()],
+            actions: [
+              TFavouriteIcon(
+                productId: product.id,
+              )
+            ],
           )
         ],
       ),

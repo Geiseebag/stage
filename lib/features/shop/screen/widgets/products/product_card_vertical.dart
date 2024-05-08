@@ -1,5 +1,6 @@
 import 'package:app_stage/common/styles/shadows.dart';
 import 'package:app_stage/common/widgets/texts/product_title.dart';
+import 'package:app_stage/features/shop/controllers/cart_controller.dart';
 import 'package:app_stage/features/shop/controllers/product_controller.dart';
 import 'package:app_stage/features/shop/models/product_model.dart';
 import 'package:app_stage/features/shop/screen/home.dart';
@@ -16,9 +17,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class TProductCardVertical extends StatelessWidget {
-  const TProductCardVertical(
-      {Key? key, this.favourite = false, required this.product});
-  final bool favourite;
+  const TProductCardVertical({Key? key, required this.product});
   final ProductModel product;
   @override
   Widget build(BuildContext context) {
@@ -54,6 +53,7 @@ class TProductCardVertical extends StatelessWidget {
                         //thumbnail image
                         Center(
                           child: TRoundedImage(
+                            isNetworkImage: true,
                             imageUrl: product.thumbnail,
                             applyImageRadius: true,
                           ),
@@ -85,7 +85,9 @@ class TProductCardVertical extends StatelessWidget {
                         Positioned(
                           top: 0,
                           right: 0,
-                          child: TFavouriteIcon(),
+                          child: TFavouriteIcon(
+                            productId: product.id,
+                          ),
                         ),
                       ],
                     ),
@@ -149,27 +151,8 @@ class TProductCardVertical extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: TColors.dark,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(TSizes.cardRadiusMd),
-                            bottomRight:
-                                Radius.circular(TSizes.productImageRadius),
-                          ),
-                        ),
-                        child: const SizedBox(
-                          width: TSizes.iconLg * 1.2,
-                          height: TSizes.iconLg * 1.2,
-                          child: Center(
-                            child: Icon(
-                              CupertinoIcons.add,
-                              color: TColors.white,
-                              size: 19,
-                            ),
-                          ),
-                        ),
-                      )
+                      //add to cart
+                      AddToCartButton(product: product)
                     ],
                   ),
                 ],
@@ -178,6 +161,59 @@ class TProductCardVertical extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AddToCartButton extends StatelessWidget {
+  const AddToCartButton({
+    super.key,
+    required this.product,
+  });
+  final ProductModel product;
+  @override
+  Widget build(BuildContext context) {
+    final controller = CartController.instance;
+    return InkWell(
+      onTap: () {
+        if (product.productType == ProductType.single.toString()) {
+          final cartItem = controller.convertToCartItem(product, 1);
+          controller.addOneToCart(cartItem);
+        } else {
+          Get.to(() => ProductDetailsScreen(product: product));
+        }
+      },
+      child: Obx(() {
+        final productQuantity = controller.getProductQuantityInCart(product.id);
+        return Container(
+          decoration: BoxDecoration(
+            color: productQuantity > 0 ? TColors.primary : TColors.dark,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(TSizes.cardRadiusMd),
+              bottomRight: Radius.circular(TSizes.productImageRadius),
+            ),
+          ),
+          child: SizedBox(
+            width: TSizes.iconLg * 1.2,
+            height: TSizes.iconLg * 1.2,
+            child: Center(
+              child: productQuantity > 0
+                  ? Text(
+                      productQuantity.toString(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .apply(color: TColors.white),
+                    )
+                  : const Icon(
+                      CupertinoIcons.add,
+                      color: TColors.white,
+                      size: 19,
+                    ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
@@ -281,7 +317,7 @@ class TCircularIcon extends StatelessWidget {
               : TColors.white.withOpacity(0.9),
         ),
         child: IconButton(
-          onPressed: () {},
+          onPressed: onPressed,
           icon: Icon(
             icon,
             color: color,

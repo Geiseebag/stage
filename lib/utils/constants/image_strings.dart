@@ -5,6 +5,12 @@ class TImages {
   //animations
   static const String animation1 =
       "assets/images/animations/141594-animation-of-docer.json";
+  static const String cartAnimation =
+      "assets/images/animations/lady-adding-product-in-cart-animation.json";
+  static const String pencilAnimation =
+      "assets/images/animations/140429-pencil-drawing.json";
+  static const String orderCompleteAnimation =
+      "assets/images/animations/order-complete-car-delivery-animation.json";
 
   // -- App Logos
   static const String darkAppLogo = "assets/logos/logo_black.png";

@@ -5,6 +5,7 @@ import 'package:app_stage/data/repositories/authentication/authentication_reposi
 import 'package:app_stage/features/personalization/controllers/user_controller.dart';
 import 'package:app_stage/features/personalization/screen/address.dart';
 import 'package:app_stage/features/personalization/screen/profile.dart';
+import 'package:app_stage/features/shop/screen/order/order.dart';
 import 'package:app_stage/features/shop/screen/store.dart';
 import 'package:app_stage/features/shop/screen/widgets/texts/section_heading.dart';
 import 'package:app_stage/utils/constants/colors.dart';
@@ -72,6 +73,7 @@ class SettingsScreen extends StatelessWidget {
                     title: "My Cart",
                     subtitle: "Add, remove products and move to checkout"),
                 TSettingsMenuTile(
+                    onTap: () => Get.to(() => OrderScreen()),
                     icon: Iconsax.shopping_bag,
                     title: "My Orders",
                     subtitle: "In Prgress and Completed Orders"),

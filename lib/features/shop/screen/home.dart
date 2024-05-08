@@ -3,9 +3,10 @@ import 'package:app_stage/common/widgets/custom_shapes/searchbar.dart';
 import 'package:app_stage/common/widgets/shimmers/shimmers.dart';
 import 'package:app_stage/common/widgets/shimmers/vertical_product_shimmer.dart';
 import 'package:app_stage/features/personalization/controllers/user_controller.dart';
-import 'package:app_stage/features/personalization/screen/cart.dart';
 import 'package:app_stage/features/shop/controllers/banner_controller.dart';
+import 'package:app_stage/features/shop/controllers/cart_controller.dart';
 import 'package:app_stage/features/shop/controllers/product_controller.dart';
+import 'package:app_stage/features/shop/screen/cart/cart.dart';
 import 'package:app_stage/features/shop/screen/widgets/categories/categories.dart';
 import 'package:app_stage/features/shop/screen/widgets/products/product_card_vertical.dart';
 import 'package:app_stage/utils/constants/colors.dart';
@@ -130,7 +131,7 @@ class HomeAppBar extends StatelessWidget {
       ]),
       actions: [
         TCartCounterIcon(
-          onPressed: () => Get.to(() => const CartScreen()),
+          onPressed: () => Get.to(() => CartScreen()),
           iconColor: TColors.white,
         )
       ],
@@ -150,7 +151,7 @@ class TCartCounterIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
-
+    final controller = Get.put(CartController());
     return Stack(children: [
       IconButton(
           onPressed: onPressed,
@@ -174,17 +175,19 @@ class TCartCounterIcon extends StatelessWidget {
                       : TColors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(100)),
               child: Center(
-                child: Text(
-                  "2",
-                  style: dark
-                      ? Theme.of(context)
-                          .textTheme
-                          .labelSmall!
-                          .apply(color: TColors.black)
-                      : Theme.of(context)
-                          .textTheme
-                          .labelSmall!
-                          .apply(color: TColors.white),
+                child: Obx(
+                  () => Text(
+                    controller.noOfCartItems.value.toString(),
+                    style: dark
+                        ? Theme.of(context)
+                            .textTheme
+                            .labelSmall!
+                            .apply(color: TColors.black)
+                        : Theme.of(context)
+                            .textTheme
+                            .labelSmall!
+                            .apply(color: TColors.white),
+                  ),
                 ),
               )))
     ]);

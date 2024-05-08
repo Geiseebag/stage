@@ -55,7 +55,7 @@ class TBrandShowcase extends StatelessWidget {
         padding: const EdgeInsets.all(TSizes.sm),
         child: Image(
           fit: BoxFit.contain,
-          image: AssetImage(image),
+          image: NetworkImage(image),
         ),
       ),
     );

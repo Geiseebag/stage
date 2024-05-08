@@ -136,7 +136,6 @@ class UserController extends GetxController {
       XFile? image = await ImagePicker().pickImage(
         source: ImageSource.gallery,
       );
-      print('${image?.path}');
 
       if (image != null) {
         //upload image
